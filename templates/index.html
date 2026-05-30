@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titanic Survival Predictor - ML Web Application</title>
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="An interactive, production-ready machine learning web app to predict Titanic passenger survival using a Random Forest model.">
+    <meta name="author" content="Antigravity Coding Assistant">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/titanic.png">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Custom styles -->
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+
+    <!-- SVG Gradients Definition for Radial Gauge -->
+    <svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
+        <defs>
+            <linearGradient id="gauge-gradient-survived" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00b09b" />
+                <stop offset="100%" stop-color="#96c93d" />
+            </linearGradient>
+            <linearGradient id="gauge-gradient-deceased" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f857a6" />
+                <stop offset="100%" stop-color="#ff5858" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark py-3">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fa-solid fa-ship me-2"></i>TITANIC PREDICTOR
+            </a>
+            <span class="navbar-text text-muted d-none d-sm-inline-block">
+                Production-Ready ML Inference Engine
+            </span>
+        </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <header class="hero-section">
+        <div class="container">
+            <div class="hero-img-container">
+                <img src="{{ url_for('static', filename='images/titanic_hero.png') }}" alt="Titanic Illustration" class="hero-img">
+            </div>
+            <h1 class="hero-title">Titanic Survival Predictor</h1>
+            <p class="hero-subtitle">
+                Enter demographic and ticketing details below to run a real-time prediction using our trained Random Forest classification model.
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container pb-5">
+        <div class="row g-4 justify-content-center">
+            
+            <!-- Left Side: Interactive Input Form -->
+            <div class="col-lg-7">
+                <div class="glass-card p-4 p-md-5">
+                    <h3 class="mb-4"><i class="fa-solid fa-sliders text-info me-2"></i>Passenger Attributes</h3>
+                    
+                    <form id="prediction-form" novalidate>
+                        
+                        <!-- 1. Passenger Ticket Class (Pclass) -->
+                        <div class="mb-4">
+                            <label class="form-label-custom">
+                                <i class="fa-solid fa-id-card"></i> Ticket Class (Pclass)
+                            </label>
+                            <div class="pclass-group">
+                                <label class="pclass-card">
+                                    <input type="radio" name="Pclass" value="1" checked>
+                                    <div class="class-content">
+                                        <i class="fa-solid fa-gem class-icon"></i>
+                                        <span class="class-label">1st Class</span>
+                                        <span class="class-desc">Upper Deck</span>
+                                    </div>
+                                </label>
+                                <label class="pclass-card">
+                                    <input type="radio" name="Pclass" value="2">
+                                    <div class="class-content">
+                                        <i class="fa-solid fa-user-tie class-icon"></i>
+                                        <span class="class-label">2nd Class</span>
+                                        <span class="class-desc">Middle Deck</span>
+                                    </div>
+                                </label>
+                                <label class="pclass-card">
+                                    <input type="radio" name="Pclass" value="3">
+                                    <div class="class-content">
+                                        <i class="fa-solid fa-users class-icon"></i>
+                                        <span class="class-label">3rd Class</span>
+                                        <span class="class-desc">Lower Deck</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div id="Pclass-error" class="validation-error-msg"></div>
+                        </div>
+
+                        <!-- 2. Gender (Sex) -->
+                        <div class="mb-4">
+                            <label class="form-label-custom">
+                                <i class="fa-solid fa-venus-mars"></i> Gender (Sex)
+                            </label>
+                            <div class="btn-select-group">
+                                <label class="btn-select-item">
+                                    <input type="radio" name="Sex" value="male" checked>
+                                    <span class="btn-select-label">Male</span>
+                                </label>
+                                <label class="btn-select-item">
+                                    <input type="radio" name="Sex" value="female">
+                                    <span class="btn-select-label">Female</span>
+                                </label>
+                            </div>
+                            <div id="Sex-error" class="validation-error-msg"></div>
+                        </div>
+
+                        <!-- 3. Age Slider -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label-custom m-0">
+                                    <i class="fa-solid fa-calendar-days"></i> Age (Years)
+                                </label>
+                                <span class="slider-val" id="age-val">28 yrs</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" class="form-range-custom" id="Age" name="Age" min="0" max="80" step="1" value="28">
+                                <div class="d-flex justify-content-between text-muted fs-7 mt-2">
+                                    <span>Infant (0)</span>
+                                    <span>Adult (28)</span>
+                                    <span>Elderly (80)</span>
+                                </div>
+                            </div>
+                            <div id="Age-error" class="validation-error-msg"></div>
+                        </div>
+
+                        <!-- 4. Family Information (SibSp & Parch) -->
+                        <div class="row g-3 mb-4">
+                            <!-- Siblings / Spouses (SibSp) -->
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="SibSp">
+                                    <i class="fa-solid fa-people-arrows"></i> Siblings/Spouses
+                                </label>
+                                <input type="number" class="form-control input-custom" id="SibSp" name="SibSp" min="0" max="10" value="0">
+                                <div id="SibSp-error" class="validation-error-msg"></div>
+                            </div>
+                            <!-- Parents / Children (Parch) -->
+                            <div class="col-md-6">
+                                <label class="form-label-custom" for="Parch">
+                                    <i class="fa-solid fa-people-group"></i> Parents/Children
+                                </label>
+                                <input type="number" class="form-control input-custom" id="Parch" name="Parch" min="0" max="10" value="0">
+                                <div id="Parch-error" class="validation-error-msg"></div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Real-Time Calculation Previews -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6">
+                                <div class="feature-badge-card">
+                                    <span class="feature-badge-title">Family Size</span>
+                                    <span class="feature-badge-value" id="calc-family-size">1</span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="feature-badge-card">
+                                    <span class="feature-badge-title">Is Alone?</span>
+                                    <span class="feature-badge-value" id="calc-is-alone">Yes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. Ticket Fare (Fare) -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label-custom m-0">
+                                    <i class="fa-solid fa-ticket"></i> Ticket Fare Paid
+                                </label>
+                                <span class="slider-val" id="fare-val">$32.00</span>
+                            </div>
+                            <div class="slider-container">
+                                <input type="range" class="form-range-custom" id="Fare" name="Fare" min="0" max="300" step="0.5" value="32">
+                                <div class="d-flex justify-content-between text-muted fs-7 mt-2">
+                                    <span>$0 (Free)</span>
+                                    <span>$32 (Avg)</span>
+                                    <span>$300 (High)</span>
+                                </div>
+                            </div>
+                            <div id="Fare-error" class="validation-error-msg"></div>
+                        </div>
+
+                        <!-- 7. Embarked Port (Embarked) -->
+                        <div class="mb-5">
+                            <label class="form-label-custom">
+                                <i class="fa-solid fa-anchor"></i> Port of Embarkation
+                            </label>
+                            <div class="btn-select-group">
+                                <label class="btn-select-item">
+                                    <input type="radio" name="Embarked" value="S" checked>
+                                    <span class="btn-select-label">Southampton (UK)</span>
+                                </label>
+                                <label class="btn-select-item">
+                                    <input type="radio" name="Embarked" value="C">
+                                    <span class="btn-select-label">Cherbourg (FR)</span>
+                                </label>
+                                <label class="btn-select-item">
+                                    <input type="radio" name="Embarked" value="Q">
+                                    <span class="btn-select-label">Queenstown (IE)</span>
+                                </label>
+                            </div>
+                            <div id="Embarked-error" class="validation-error-msg"></div>
+                        </div>
+
+                        <!-- Action Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-predict" id="btn-predict">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="btn-spinner"></span>
+                                <span id="btn-text">Predict Survival</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Side: Predictions Dashboard -->
+            <div class="col-lg-5">
+                <div class="glass-card p-4 p-md-5 h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <h3 class="mb-4"><i class="fa-solid fa-chart-pie text-info me-2"></i>Prediction Result</h3>
+                        
+                        <!-- Placeholder State (Before calculation) -->
+                        <div id="result-placeholder" class="result-placeholder">
+                            <i class="fa-solid fa-circle-question"></i>
+                            <h4>Ready for Input</h4>
+                            <p class="text-muted m-0">Fill in the passenger profile on the left and click "Predict Survival" to calculate outcomes.</p>
+                        </div>
+
+                        <!-- Calculated Results Content -->
+                        <div id="result-content" class="result-content-wrapper">
+                            
+                            <!-- Survival/Deceased status card -->
+                            <div id="prediction-status" class="prediction-status-card">
+                                PASSENGER SURVIVED
+                            </div>
+
+                            <!-- Circle Radial Gauge -->
+                            <div class="gauge-container">
+                                <svg class="gauge-svg" viewBox="0 0 160 160">
+                                    <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
+                                    <circle class="gauge-fill" id="gauge-fill" cx="80" cy="80" r="70"></circle>
+                                </svg>
+                                <div class="gauge-text">
+                                    <div class="gauge-percentage" id="gauge-percentage">0%</div>
+                                    <div class="gauge-label">Survival probability</div>
+                                </div>
+                            </div>
+
+                            <!-- Key Influencing Factors List -->
+                            <h5 class="text-white mt-4 mb-3 border-bottom pb-2 border-secondary">
+                                <i class="fa-solid fa-brain me-2 text-info"></i>Key Model Insights
+                            </h5>
+                            <div id="factors-list" class="d-flex flex-column gap-2 mb-4">
+                                <!-- Factors populated dynamically via main.js -->
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- FAQ / Historical Accordion -->
+                    <div class="accordion accordion-custom mt-4" id="historical-accordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    <i class="fa-solid fa-history me-2 text-warning"></i>Historical Titanic Stats
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#historical-accordion">
+                                <div class="accordion-body">
+                                    During the 1912 disaster, overall survival was around <strong>32%</strong>. 
+                                    However, demographics played a massive role:
+                                    <ul>
+                                        <li><strong>First Class:</strong> ~62% survived</li>
+                                        <li><strong>Third Class:</strong> ~24% survived</li>
+                                        <li><strong>Females:</strong> ~74% survived</li>
+                                        <li><strong>Males:</strong> ~19% survived</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    <i class="fa-solid fa-gears me-2 text-warning"></i>How this Model Works
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#historical-accordion">
+                                <div class="accordion-body">
+                                    This app uses a fitted <strong>Random Forest Classifier</strong> pipeline containing 200 decision trees. 
+                                    Inputs are preprocessed (standardized numerical features and one-hot encoded categorical inputs) 
+                                    before evaluating trees to output probabilities.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center mt-5">
+        <div class="container">
+            <p class="mb-1">&copy; 2026 Titanic ML Predictor App. Built with Flask, Bootstrap, & Scikit-Learn.</p>
+            <p class="m-0 fs-8">Designed by <a href="#" target="_blank">Antigravity AI</a>. Running on Render.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
