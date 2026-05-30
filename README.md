@@ -118,7 +118,29 @@ The project explored multiple classification models to optimize accuracy:
 5. **View the site:**
    Open your browser and navigate to `http://127.0.0.1:5000`.
 
-### Method B: Run the Jupyter Analysis Notebook
+### Method B: Run the Streamlit Dashboard (Alternative Web Interface)
+
+1. **Activate your virtual environment** (if not already activated):
+   * *Windows (PowerShell):*
+     ```powershell
+     .\venv\Scripts\Activate.ps1
+     ```
+   * *macOS/Linux:*
+     ```bash
+     source venv/bin/activate
+     ```
+2. **Install Streamlit** (if not already installed via requirements):
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Launch the Streamlit app:**
+   ```bash
+   streamlit run streamlit_app.py
+   ```
+4. **View the site:**
+   It will automatically open your default browser to `http://localhost:8501`.
+
+### Method C: Run the Jupyter Analysis Notebook
 
 1. Ensure you have Jupyter installed:
    ```bash
