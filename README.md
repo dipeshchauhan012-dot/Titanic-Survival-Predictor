@@ -1,6 +1,6 @@
 # Titanic Survival Predictor
 
-A modern, production-ready machine learning web application that predicts Titanic passenger survival using historical passenger data. This repository includes data analysis notebooks, a serialized Random Forest classifier pipeline, and an interactive Flask-based web application with a responsive Bootstrap 5 interface.
+A professional, production-ready machine learning web application that predicts Titanic passenger survival using historical passenger data. This repository includes data analysis notebooks, a serialized Random Forest classifier pipeline, and a production-grade interactive dashboard built with **Streamlit** (along with an alternative **Flask API** backend).
 
 ---
 
@@ -8,7 +8,7 @@ A modern, production-ready machine learning web application that predicts Titani
 
 The sinking of the Titanic is one of the most infamous shipwreck disasters in history. On April 15, 1912, during her maiden voyage, the widely considered "unsinkable" Titanic sank after colliding with an iceberg. Unfortunately, there were not enough lifeboats for everyone onboard, resulting in the death of 1502 out of 2224 passengers and crew.
 
-While there was some element of luck involved in surviving, it seems some groups of people were more likely to survive than others, such as women, children, and the upper-class. 
+While there was some element of luck involved in surviving, it seems some groups of people were more likely to survive than others, such as women, children, and the upper-class.
 
 This project aims to build a predictive model that answers the question: "What sorts of people were more likely to survive?" using passenger demographics and ticket profiles.
 
@@ -84,14 +84,36 @@ The project explored multiple classification models to optimize accuracy:
 ### 2. Random Forest Classifier (Production Model: `titanic_model.pkl`)
 - **Architecture:** Scikit-Learn Pipeline combining a `ColumnTransformer` (standard scaler + median imputer for numerical data, one-hot encoder for categorical variables) with a `RandomForestClassifier` (200 estimators, random state 42).
 - **Features Evaluated:** Includes all raw features plus engineered variables (`FamilySize`, `IsAlone`).
-- **Use Case:** Saved as `titanic_model.pkl` using `joblib` and used for real-time inference on the web application backend.
+- **Use Case:** Saved as `titanic_model.pkl` using `joblib` and used for real-time inference in the production web app.
 
 ---
 
-## How to Run the Project
+## Final Project Structure
 
-### Method A: Run the Flask Web Application (Local Server)
+```text
+ml/
+├── app.py                  # Core Streamlit application (Entry Point for Streamlit Cloud)
+├── flask_app.py            # Alternative Flask backend API server
+├── titanic_model.pkl       # Serialized Random Forest Scikit-Learn pipeline
+├── requirements.txt        # Python package and dependency configuration
+├── Procfile                # WSGI command for Heroku/Render Flask deployments
+├── .gitignore              # Ignored files (venv, pycache, temporary files)
+├── static/
+│   ├── css/
+│   │   └── styles.css      # Styling for the Flask frontend
+│   ├── js/
+│   │   └── main.js         # AJAX routine for the Flask frontend
+│   └── images/
+│       └── titanic_hero.png # AI-generated minimalist header illustration
+└── templates/
+    └── index.html          # HTML template for the Flask frontend
+```
 
+---
+
+## How to Run the Project Locally
+
+### 1. Set Up your Environment
 1. **Navigate to the directory:**
    ```bash
    cd Titanic-Survival-Predictor
@@ -111,51 +133,38 @@ The project explored multiple classification models to optimize accuracy:
    ```bash
    pip install -r requirements.txt
    ```
-4. **Start the server:**
-   ```bash
-   python app.py
-   ```
-5. **View the site:**
-   Open your browser and navigate to `http://127.0.0.1:5000`.
 
-### Method B: Run the Streamlit Dashboard (Alternative Web Interface)
+### 2. Run the Streamlit Dashboard (Main App)
+Launch the Streamlit app:
+```bash
+streamlit run app.py
+```
+It will automatically open your default browser to **`http://localhost:8501`**.
 
-1. **Activate your virtual environment** (if not already activated):
-   * *Windows (PowerShell):*
-     ```powershell
-     .\venv\Scripts\Activate.ps1
-     ```
-   * *macOS/Linux:*
-     ```bash
-     source venv/bin/activate
-     ```
-2. **Install Streamlit** (if not already installed via requirements):
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. **Launch the Streamlit app:**
-   ```bash
-   streamlit run streamlit_app.py
-   ```
-4. **View the site:**
-   It will automatically open your default browser to `http://localhost:8501`.
+### 3. Run the Flask Web Application (Alternative Server)
+Start the alternative local Flask server:
+```bash
+python flask_app.py
+```
+Open your browser and navigate to **`http://127.0.0.1:5000`**.
 
-### Method C: Run the Jupyter Analysis Notebook
-
-1. Ensure you have Jupyter installed:
-   ```bash
-   pip install jupyter
-   ```
-2. Run the notebook kernel:
-   ```bash
-   jupyter notebook Titanic_Survival_Predictor.ipynb
-   ```
+### 4. Run the Jupyter Analysis Notebook
+Run the notebook kernel:
+```bash
+jupyter notebook Titanic_Survival_Predictor.ipynb
+```
 
 ---
 
-## Future Improvements
+## Streamlit Community Cloud Deployment Guide
 
-- **Hyperparameter Optimization:** Implement grid search (`GridSearchCV`) or randomized search to tune the Random Forest and test gradient boosting models (XGBoost, LightGBM).
-- **Name Casing & Title Extraction:** Parse title indicators (e.g. Mr., Mrs., Miss., Master., Dr.) from passenger names to better infer social status and age ranges.
-- **Deck Mapping:** Parse the first letter of cabin allocations to map passengers to specific decks on the ship, as deck proximity to lifeboats had high correlation with survival.
-- **Continuous Integration (CI):** Establish automated GitHub Actions to test Flask routes and predictions.
+To deploy this project to the [Streamlit Community Cloud](https://streamlit.io/cloud):
+
+1. **GitHub Setup:** Ensure your local project is pushed to your public GitHub repository (`https://github.com/dipeshchauhan012-dot/Titanic-Survival-Predictor`).
+2. **Streamlit Sign-In:** Go to [share.streamlit.io](https://share.streamlit.io/) and log in with your GitHub account.
+3. **Create App:** Click **New app**.
+4. **App Configurations:**
+   - **Repository:** `dipeshchauhan012-dot/Titanic-Survival-Predictor`
+   - **Branch:** `main`
+   - **Main file path:** `app.py`
+5. **Deploy:** Click **Deploy!**. Streamlit will automatically read the `requirements.txt` file, install all Python packages, load the `titanic_model.pkl` pipeline, and launch your dashboard live.
