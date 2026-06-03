@@ -2,7 +2,7 @@
 title: Titanic Survival Predictor
 emoji: 🚢
 colorFrom: blue
-colorTo: cyan
+colorTo: indigo
 sdk: docker
 app_port: 8501
 pinned: false
