@@ -1,21 +1,22 @@
-# Use the official slim Python 3.11 image
-FROM python:3.11-slim
+# Use the official full Python 3.11 image (includes essential compilation headers and libraries)
+FROM python:3.11
 
 # Set working directory inside the container
 WORKDIR /app
 
-# Install basic build tools and dependencies
+# Install basic build tools, curl, and git
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
-    software-properties-common \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements.txt first to leverage Docker cache
 COPY requirements.txt .
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Upgrade pip, setuptools, and wheel to ensure modern binary wheels are recognized, then install requirements
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application files
 COPY . .
