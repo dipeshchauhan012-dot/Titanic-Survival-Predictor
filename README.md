@@ -1,3 +1,13 @@
+---
+title: Titanic Survival Predictor
+emoji: 🚢
+colorFrom: blue
+colorTo: cyan
+sdk: docker
+app_port: 8501
+pinned: false
+---
+
 # Titanic Survival Predictor
 
 A professional, production-ready machine learning web application that predicts Titanic passenger survival using historical passenger data. This repository includes data analysis notebooks, a serialized Random Forest classifier pipeline, and a production-grade interactive dashboard built with **Streamlit** (along with an alternative **Flask API** backend).
